@@ -1,6 +1,7 @@
 package com.minicommerce.app.models.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,5 +51,11 @@ public class UserServiceImpl implements IUserService{
 	public void changePassword(String password, String username) {
 		userDao.changePassword(password, username);
 		
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public User findById(Integer id) {
+		return userDao.findById(id).orElse(null);
 	}
 }

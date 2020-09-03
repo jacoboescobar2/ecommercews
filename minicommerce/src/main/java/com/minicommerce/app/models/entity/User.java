@@ -39,6 +39,8 @@ public class User implements Serializable{
 	@NotNull
 	private String password;
 	
+	private Double cash;
+	
 	@NotNull
 	private Boolean state;
 	
@@ -110,6 +112,14 @@ public class User implements Serializable{
 
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
+	}
+
+	public Double getCash() {
+		return cash;
+	}
+
+	public void setCash(Double cash) {
+		this.cash = cash;
 	}
 
 	public static long getSerialversionuid() {

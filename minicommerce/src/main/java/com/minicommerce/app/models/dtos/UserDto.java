@@ -11,6 +11,7 @@ public class UserDto {
 	private String lastname;
 	private String user;
 	private String password;
+	private Double cash;
 	private Boolean state;
 	private StatusRol rol;
 	private List<OrderDto> orders;
@@ -62,6 +63,12 @@ public class UserDto {
 	}
 	public void setOrders(List<OrderDto> orders) {
 		this.orders = orders;
+	}
+	public Double getCash() {
+		return cash;
+	}
+	public void setCash(Double cash) {
+		this.cash = cash;
 	}
 
 }

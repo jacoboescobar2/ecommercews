@@ -17,4 +17,6 @@ public interface IUserService {
 	public void unBlockUser(String username);
 	
 	public void changePassword(String password, String username);
+	
+	public User findById(Integer id);
 }

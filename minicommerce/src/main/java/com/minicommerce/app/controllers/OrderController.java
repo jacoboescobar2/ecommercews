@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.minicommerce.app.helpers.ECommerceHelper;
 import com.minicommerce.app.models.dtos.OrderDto;
@@ -18,7 +19,7 @@ import com.minicommerce.app.models.entity.Order;
 import com.minicommerce.app.models.service.IOrderService;
 import com.minicommerce.app.util.ModelMapperUtil;
 
-@Controller
+@RestController
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/orders")
 public class OrderController {
