@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.minicommerce.app.helpers.ECommerceHelper;
 import com.minicommerce.app.models.dtos.UserDto;
 import com.minicommerce.app.models.entity.User;
+import com.minicommerce.app.models.enums.StatusRol;
 import com.minicommerce.app.models.service.IUserService;
 import com.minicommerce.app.util.ModelMapperUtil;
 
@@ -75,6 +76,9 @@ public class UserController {
 			dto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 			LOGGER.info("USer password :: " + dto.getPassword());
 			dto.setUser(userDto.getUser());
+			dto.setState(true);
+			dto.setRol(StatusRol.CLIENTE);
+			dto.setCash(userDto.getCash());
 			userService.save(ModelMapperUtil.map(dto, User.class));
 			responseEntity = ResponseEntity.ok().build();
 		} catch (Exception exception) {
@@ -143,6 +147,45 @@ public class UserController {
 			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
 		}
 		
+		return responseEntity;
+	}
+	
+	@Secured("ROLE_ADMINISTRADOR")
+	@GetMapping("/findById/{id}")
+	public ResponseEntity findById(@PathVariable(value = "id") Integer id) {
+		ResponseEntity responseEntity;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
+		
+		try {
+			User user = userService.findById(id);
+			responseEntity = ResponseEntity.ok().headers(header)
+					.contentType(MediaType.parseMediaType("application/json")).body(ModelMapperUtil.map(user, UserDto.class));
+		} catch (Exception exception) {
+			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
+		
+		return responseEntity;
+	}
+	
+	@Secured("ROLE_ADMINISTRADOR")
+	@PostMapping("/changeUser")
+	public ResponseEntity changeUser(@RequestBody UserDto userDto) {
+		ResponseEntity responseEntity;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
+
+		try {
+			userService.save(ModelMapperUtil.map(userDto, User.class));
+			responseEntity = ResponseEntity.ok().build();
+		} catch (Exception exception) {
+			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
+
 		return responseEntity;
 	}
 	

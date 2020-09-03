@@ -26,4 +26,23 @@ public class ProductServiceImpl implements IProductService{
 	public void save(Product product) {
 		productDao.save(product);
 	}
+
+	@Override
+	@Transactional
+	public void delete(Product pro) {
+		productDao.delete(pro);
+		
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public Product findById(Integer id) {
+		return productDao.findById(id).orElse(null);
+	}
+
+	@Override
+	public List<Product> findProducByName(String name) {
+		return productDao.findProducByName(name);
+	}
+	
 }

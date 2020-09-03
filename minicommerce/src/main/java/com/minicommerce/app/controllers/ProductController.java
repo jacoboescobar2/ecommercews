@@ -12,14 +12,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.minicommerce.app.helpers.ECommerceHelper;
 import com.minicommerce.app.models.dtos.ProductDto;
 import com.minicommerce.app.models.entity.Product;
+import com.minicommerce.app.models.enums.StatusProduct;
 import com.minicommerce.app.models.service.IProductService;
 import com.minicommerce.app.util.ModelMapperUtil;
 
@@ -31,7 +34,6 @@ public class ProductController {
 	@Autowired
 	private IProductService productService;
 	
-	@Secured("ROLE_EMPLEADO")
 	@GetMapping("/findAll")
 	public ResponseEntity findAllProducts() {
 		ResponseEntity responseEntity;
@@ -51,8 +53,68 @@ public class ProductController {
 		return responseEntity;
 	}
 	
+	@Secured({"ROLE_ADMINISTRADOR","ROLE_EMPLEADO"})
+	@GetMapping("/findById/{id}")
+	public ResponseEntity findById(@PathVariable(value = "id") Integer id) {
+		ResponseEntity responseEntity;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
+		
+		try {
+			Product product = productService.findById(id);
+			responseEntity = ResponseEntity.ok().headers(header)
+					.contentType(MediaType.parseMediaType("application/json")).body(ModelMapperUtil.map(product, ProductDto.class));
+		} catch (Exception exception) {
+			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
+		
+		return responseEntity;
+	}
+	
+	@GetMapping("/findById")
+	public ResponseEntity findByName(@RequestParam(value = "name") String name) {
+		ResponseEntity responseEntity;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
+		
+		try {
+			List<Product> lstProduct = productService.findProducByName(name);
+			responseEntity = ResponseEntity.ok().headers(header)
+					.contentType(MediaType.parseMediaType("application/json")).body(ModelMapperUtil.mapColletion(lstProduct, ProductDto.class));
+		} catch (Exception exception) {
+			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
+		
+		return responseEntity;
+	}
+	
+	@Secured({"ROLE_ADMINISTRADOR","ROLE_EMPLEADO"})
 	@PostMapping("/createProduct")
 	public ResponseEntity createProduct(@RequestBody ProductDto productDto) {
+		ResponseEntity responseEntity;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
+
+		try {
+			productDto.setProductstatus(StatusProduct.PUBLICADO);
+			productService.save(ModelMapperUtil.map(productDto, Product.class));
+			responseEntity = ResponseEntity.ok().build();
+		} catch (Exception exception) {
+			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
+
+		return responseEntity;
+	}
+	
+	@Secured({"ROLE_ADMINISTRADOR","ROLE_EMPLEADO"})
+	@PostMapping("/editProduct")
+	public ResponseEntity editProduct(@RequestBody ProductDto productDto) {
 		ResponseEntity responseEntity;
 		HttpHeaders header = new HttpHeaders();
 		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -69,8 +131,9 @@ public class ProductController {
 		return responseEntity;
 	}
 	
-	@PostMapping("/editProduct")
-	public ResponseEntity editProduct(@RequestBody ProductDto productDto) {
+	@Secured({"ROLE_ADMINISTRADOR","ROLE_EMPLEADO"})
+	@PostMapping("/deleteProduct")
+	public ResponseEntity deleteProduct(@RequestBody ProductDto productDto) {
 		ResponseEntity responseEntity;
 		HttpHeaders header = new HttpHeaders();
 		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -78,7 +141,7 @@ public class ProductController {
 		header.add("Expires", "0");
 
 		try {
-			productService.save(ModelMapperUtil.map(productDto, Product.class));
+			productService.delete(ModelMapperUtil.map(productDto, Product.class));
 			responseEntity = ResponseEntity.ok().build();
 		} catch (Exception exception) {
 			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());

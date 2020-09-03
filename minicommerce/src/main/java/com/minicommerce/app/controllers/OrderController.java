@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +49,25 @@ public class OrderController {
 				newOrder.setDiscount(0.0);
 			}
 			orderService.save(ModelMapperUtil.map(newOrder, Order.class));
+			responseEntity = ResponseEntity.ok().build();
+		} catch (Exception exception) {
+			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
+
+		return responseEntity;
+	}
+	
+	
+	@PostMapping("/addItemToOrder")
+	public ResponseEntity addItemToOrder(@RequestBody OrderDto orderDto) {
+		ResponseEntity responseEntity;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
+
+		try {
+			orderService.save(ModelMapperUtil.map(orderDto, Order.class));
 			responseEntity = ResponseEntity.ok().build();
 		} catch (Exception exception) {
 			responseEntity = ECommerceHelper.createErrorEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
